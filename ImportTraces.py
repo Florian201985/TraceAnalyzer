@@ -10,8 +10,8 @@ from Trace import Trace
 
 def ImportData(path, traceType):
     axis_out = []
-    #path = 'C:\\01_Arbeit\\431008\\DatenMaschine\\Moment_B_C.xml'
-    #xml_data = open(path, 'r').read()
+    # path = 'C:\\01_Arbeit\\431008\\DatenMaschine\\Moment_B_C.xml'
+    # xml_data = open(path, 'r').read()
     xml_data = path
     xmlDict = xmltodict.parse(xml_data)
 
@@ -44,80 +44,78 @@ def ImportData(path, traceType):
         key = trace_name['@key']
         id = trace_name['@id']
 
-        match name:
-            case 'nckServoDataActPos2ndEnc64':
-                value_description_long = 'Lageistwert'
-                value_description_short = 'Lageistwert'
-                unit = 'mm'
-            case 'nckServoDataContDev64':
-                value_description_long = 'Konturabweichung'
-                value_description_short = 'Konturabweichung'
-                unit = 'mm'
-            case 'nckServoDataCmdTorque64':
-                value_description_long = 'Momenten-/Kraft-Sollwert (begrenzt)'
-                value_description_short = 'Momenten_Kraft_Sollwert'
-                unit = 'Nm'
-            case 'nckServoDataActCurr64':
-                value_description_long = 'Momentenbildender Stromistwert'
-                value_description_short = 'Stromistwert'
-                unit = 'A'
-            case 'nckServoDataDrvLoad64':
-                value_description_long = 'Auslastung (m_soll/m_soll,grenz)'
-                value_description_short = 'Auslastung'
-                unit = '%'
-            case 'nckServoDataActVelMot64':
-                value_description_long = 'Drehzahl-/Geschwindigkeitsistwert Motor'
-                value_description_short = 'Drehzahl_Geschwindigkeitsistwert'
-                unit = 'rpm/ m/s'
-            case 'measPosDev':
-                value_description_long = 'Lageistwert-Differenz zwischen 2 Messsystemen'
-                value_description_short = 'Messsystemen_Differenz'
-                unit = 'mm'
-            case 'nckServoDataActPos1stEnc64':
-                value_description_long = 'Lageistwert_Messsystem_1'
-                value_description_short = 'Lageistwert_Messsystem_1'
-                unit = 'mm'
-            case 'nckServoDataActPos2ndEnc64':
-                value_description_long = 'Lageistwert_Messsystem_2'
-                value_description_short = 'Lageistwert_Messsystem_2'
-                unit = 'mm'
-            case 'nckServoDataCtrlDev64':
-                value_description_long = 'Regeldifferenz'
-                value_description_short = 'Regeldifferenz'
-                unit = 'mm'
-            case 'nckServoDataActEnc64':
-                value_description_long = 'Aktives_Messsystem'
-                value_description_short = 'Aktives_Messsystem'
-                unit = ''
-            case 'actToolBasePos':
-                value_description_long = 'Werkzeugaufnahme'
-                value_description_short = 'Werkzeugaufnahme'
-                unit = ''
-            case 'GRD_ACTUALSTROKENUMBER':
-                value_description_long = 'Hubnummer'
-                value_description_short = 'Hubnummer'
-                unit = ''
-            case other:
-                value_description_long = 'unknown'
-                value_description_short = 'unknown'
-                unit = ''
-        match axis_number:
-            case 0:
-                axis = 'No'
-            case 1:
-                axis = 'X'
-            case 2:
-                axis = 'Y'
-            case 3:
-                axis = 'B'
-            case 5:
-                axis = 'A'
-            case 7:
-                axis = 'C'
-            case 11:
-                axis = 'Z'
-            case other:
-                axis = 'unknown'
+        if name == 'nckServoDataActPos2ndEnc64':
+            value_description_long = 'Lageistwert'
+            value_description_short = 'Lageistwert'
+            unit = 'mm'
+        elif name == 'nckServoDataContDev64':
+            value_description_long = 'Konturabweichung'
+            value_description_short = 'Konturabweichung'
+            unit = 'mm'
+        elif name == 'nckServoDataCmdTorque64':
+            value_description_long = 'Momenten-/Kraft-Sollwert (begrenzt)'
+            value_description_short = 'Momenten_Kraft_Sollwert'
+            unit = 'Nm'
+        elif name == 'nckServoDataActCurr64':
+            value_description_long = 'Momentenbildender Stromistwert'
+            value_description_short = 'Stromistwert'
+            unit = 'A'
+        elif name == 'nckServoDataDrvLoad64':
+            value_description_long = 'Auslastung (m_soll/m_soll,grenz)'
+            value_description_short = 'Auslastung'
+            unit = '%'
+        elif name == 'nckServoDataActVelMot64':
+            value_description_long = 'Drehzahl-/Geschwindigkeitsistwert Motor'
+            value_description_short = 'Drehzahl_Geschwindigkeitsistwert'
+            unit = 'rpm/ m/s'
+        elif name == 'measPosDev':
+            value_description_long = 'Lageistwert-Differenz zwischen 2 Messsystemen'
+            value_description_short = 'Messsystemen_Differenz'
+            unit = 'mm'
+        elif name == 'nckServoDataActPos1stEnc64':
+            value_description_long = 'Lageistwert_Messsystem_1'
+            value_description_short = 'Lageistwert_Messsystem_1'
+            unit = 'mm'
+        elif name == 'nckServoDataActPos2ndEnc64':
+            value_description_long = 'Lageistwert_Messsystem_2'
+            value_description_short = 'Lageistwert_Messsystem_2'
+            unit = 'mm'
+        elif name == 'nckServoDataCtrlDev64':
+            value_description_long = 'Regeldifferenz'
+            value_description_short = 'Regeldifferenz'
+            unit = 'mm'
+        elif name == 'nckServoDataActEnc64':
+            value_description_long = 'Aktives_Messsystem'
+            value_description_short = 'Aktives_Messsystem'
+            unit = ''
+        elif name == 'actToolBasePos':
+            value_description_long = 'Werkzeugaufnahme'
+            value_description_short = 'Werkzeugaufnahme'
+            unit = ''
+        elif name == 'GRD_ACTUALSTROKENUMBER':
+            value_description_long = 'Hubnummer'
+            value_description_short = 'Hubnummer'
+            unit = ''
+        else:
+            value_description_long = 'unknown'
+            value_description_short = 'unknown'
+            unit = ''
+        if axis_number == 0:
+            axis = 'No'
+        elif axis_number == 1:
+            axis = 'X'
+        elif axis_number == 2:
+            axis = 'Y'
+        elif axis_number == 3:
+            axis = 'B'
+        elif axis_number == 5:
+            axis = 'A'
+        elif axis_number == 7:
+            axis = 'C'
+        elif axis_number == 11:
+            axis = 'Z'
+        else:
+            axis = 'unknown'
         trace.append(Trace(value_description_long, value_description_short, axis, key, id, unit))
 
     df.rename(columns={'@time': 'time'}, inplace=True)
