@@ -2,4 +2,4 @@ streamlit
 pandas
 numpy
 xmltodict
-bokeh
+bokeh<=2.4.3
