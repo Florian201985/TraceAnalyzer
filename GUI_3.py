@@ -14,7 +14,6 @@ trace_values = []
 
 with st.sidebar:
     uploaded_files = st.file_uploader("Upload trace files", type='.xml', accept_multiple_files=True)
-    #uploaded_files = st.file_uploader("Upload trace files", type='.xml')
 
     for uploaded_file in uploaded_files:
         st.write("Importing:", uploaded_file.name)
