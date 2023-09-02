@@ -9,7 +9,7 @@ import ImportTraces
 
 st.title('Trace Analysis')
 
-# Beschreibung der INput Widgets: https://docs.streamlit.io/library/api-reference/widgets
+# Beschreibung der Input Widgets: https://docs.streamlit.io/library/api-reference/widgets
 
 trace_values = []
 
@@ -24,18 +24,21 @@ with st.sidebar:
     option_traces = st.multiselect(
         'Select Traces for analysis',
         filenames, filenames)
+    options = AnanlyzeFiles.getOptionsAxis(trace_values)
     option_X = st.selectbox(
         'Select value for the X-axis',
-        ('Email', 'Home phone', 'Mobile phone'))
+        options)
     option_Y = st.selectbox(
         'Select value for the Y-axis',
-        ('Email', 'Home phone', 'Mobile phone'))
+        options)
+    strokes = AnanlyzeFiles.getStrokes(trace_values)
     option_stroke = st.selectbox(
         'Select stroke for analysis',
-        ('Email', 'Home phone', 'Mobile phone'))
+        strokes)
+    default_idx = options.index(option_X)
     option_crop_val = st.selectbox(
         'Select value for cropping',
-        ('Email', 'Home phone', 'Mobile phone'))
+        options, index=default_idx) # default: Same as option_X
     values_crop_min = st.slider(
         'Minimum and Maximum value for cropping',
         0.0, 100.0, (25.0, 75.0))
