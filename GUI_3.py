@@ -3,6 +3,8 @@ import time
 import streamlit as st
 import pandas as pd
 import numpy as np
+from bokeh.models import LogColorMapper
+from bokeh.plotting import figure, show
 
 import AnalyzeTraces
 import AnanlyzeFiles
@@ -70,9 +72,16 @@ def getChartValues(analyzed_traces, option_traces, option_X, option_Y, option_st
                         stroke_data = act_stroke
                         x_val = stroke_data['trace'][option_X]
                         y_val = stroke_data['trace'][option_Y]
-                        trace = dict(X=x_val, Y=y_val)
+                        trace = dict(X=x_val, Y=y_val, label=name, x_label=option_X, y_label=option_Y)
                         # prüfen ob option_y in fft vorhanden, falls ja speichern falls nein None
-                        fft = dict(Amplitudes=[], Frequencies=[])
+                        fft = dict(Amplitudes=[], Frequencies=[], label='', x_label='', y_label='')
+                        keys = []
+                        for key in stroke_data['fft']:
+                            keys.append(key)
+                        if option_Y in keys:
+                            fft = dict(Amplitudes=stroke_data['fft'][option_Y]['amplitudes'],
+                                       Frequencies=stroke_data['fft'][option_Y]['frequencies'],
+                                       label=name, x_label=option_X, y_label=option_Y)
                         result = dict(trace=trace, fft=fft)
                         break
                 break
@@ -80,38 +89,43 @@ def getChartValues(analyzed_traces, option_traces, option_X, option_Y, option_st
     return result
 
 
-chart_values = dict(trace=dict(X=[1, 2, 3, 4, 5], Y=[6, 7, 2, 4, 5]),
-                    fft=dict(Amplitudes=[6, 7, 2, 4, 5], Frequencies=[1, 2, 3, 4, 5]))
+TOOLS="hover,crosshair,pan,wheel_zoom,zoom_in,zoom_out,box_zoom,undo,redo,reset,tap,save,box_select,poly_select,lasso_select,help"
+
 analyzed_traces = []
+x_label_trace = 'x'
+y_label_trace = 'y'
+x_label_fft = 'amplitudes'
+y_label_fft = 'frequencies'
 if len(trace_values) > 0:
     analyzed_traces = AnalyzeTraces.analyzeTraces(trace_values, cropping=False, crop_val='Z', start=230, end=240)
     chart_values = getChartValues(analyzed_traces, option_traces, option_X, option_Y, option_stroke)
+    x_label_trace = chart_values['trace']['x_label']
+    y_label_trace = chart_values['trace']['y_label']
 
-from bokeh.plotting import figure
+    trace_fig = figure(
+                title='Traces Stroke: ' + str(option_stroke),
+                x_axis_label=x_label_trace,
+                y_axis_label=y_label_trace,
+                tools=TOOLS)
 
-TOOLS="hover,crosshair,pan,wheel_zoom,zoom_in,zoom_out,box_zoom,undo,redo,reset,tap,save,box_select,poly_select,lasso_select,help"
-trace_fig = figure(
-            title='Traces',
-            x_axis_label='x',
-            y_axis_label='y',
-            tools=TOOLS)
+    trace_fig.line(chart_values['trace']['X'], chart_values['trace']['Y'],
+                   legend_label=chart_values['trace']['label'],
+                   line_width=2)
 
-trace_fig.line(chart_values['trace']['X'], chart_values['trace']['Y'], legend_label='trace', line_width=2)
+    st.bokeh_chart(trace_fig, use_container_width=True)
 
-st.bokeh_chart(trace_fig, use_container_width=True)
+    fft_fig = figure(
+              title='FFT Stroke: ' + str(option_stroke) + ', ' + str(option_Y),
+              x_axis_label=x_label_fft,
+              y_axis_label=y_label_fft,
+              tools=TOOLS)
 
-fft_fig = figure(
-          title='FFT',
-          x_axis_label='x',
-          y_axis_label='y',
-          tools=TOOLS)
+    fft_fig.line(chart_values['fft']['Frequencies'], chart_values['fft']['Amplitudes'],
+                 legend_label=chart_values['fft']['label'],
+                 line_width=2)
 
-fft_fig.line(chart_values['fft']['Frequencies'], chart_values['fft']['Amplitudes'], legend_label='fft', line_width=2)
+    st.bokeh_chart(fft_fig, use_container_width=True)
 
-st.bokeh_chart(fft_fig, use_container_width=True)
-
-from bokeh.models import LogColorMapper
-from bokeh.plotting import figure, show
 
 
 def normal2d(X, Y, sigx=1.0, sigy=1.0, mux=0.0, muy=0.0):
