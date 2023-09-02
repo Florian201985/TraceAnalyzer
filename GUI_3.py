@@ -3,12 +3,21 @@ import time
 import streamlit as st
 import pandas as pd
 import numpy as np
-from bokeh.models import LogColorMapper
-from bokeh.plotting import figure, show
+from bokeh.models import LogColorMapper, Range1d
+from bokeh.plotting import figure
 
 import AnalyzeTraces
 import AnanlyzeFiles
 import ImportTraces
+
+def CalcTableRPM(number_of_starts, number_of_teeth, worm_rpm):
+    result = worm_rpm * number_of_starts / number_of_teeth
+    return result
+
+def CalcFrequency(rpm):
+    result = rpm / 60.0
+    return result
+
 
 st.title('Trace Analysis')
 
@@ -46,6 +55,8 @@ with st.sidebar:
         'Minimum and Maximum value for cropping',
         0.0, 100.0, (25.0, 75.0))
     rpm = st.number_input('Define a rpm for analysis')
+    number_of_teeth = st.number_input('Define number of teeth on the gear')
+    number_of_starts = st.number_input('Define number of starts on the worm')
     harmonics = st.checkbox('Select if harmonics should be marked')
 
     df = pd.DataFrame()
@@ -128,11 +139,37 @@ if len(trace_values) > 0:
               y_axis_label=y_label_fft,
               tools=TOOLS)
 
+    max_val = 0.0
     for val in chart_values:
         fft_fig.line(val['fft']['Frequencies'], val['fft']['Amplitudes'],
                      legend_label=val['fft']['label'],
                      line_width=2, color=next(colors))
+        if max(val['fft']['Amplitudes']) >= max_val:
+            max_val = max(val['fft']['Amplitudes'])
 
+    number_of_harmonics_table = 0
+    number_of_harmonics_worm = 0
+    table_rpm = 0.0
+    tabel_freq = 0.0
+    worm_freq = 0.0
+    if harmonics:
+        table_rpm = CalcTableRPM(number_of_starts, number_of_teeth, rpm)
+        tabel_freq = CalcFrequency(table_rpm)
+        worm_freq = CalcFrequency(rpm)
+        number_of_harmonics_table = 10
+        number_of_harmonics_worm = 4
+
+    for idx in range(number_of_harmonics_table):
+        t_freq = tabel_freq * (idx + 1)
+        fft_fig.line([t_freq, t_freq], [-1.0, 1.0],
+                     legend_label='table rpm',
+                     line_width=1, color='red')
+    for idx in range(number_of_harmonics_worm):
+        w_freq = worm_freq * (idx + 1)
+        fft_fig.line([w_freq, w_freq], [-1.0, 1.0],
+                     legend_label='worm rpm',
+                     line_width=1, color='red', line_dash='dashed')
+    fft_fig.y_range = Range1d(0, max_val)
     st.bokeh_chart(fft_fig, use_container_width=True)
 
 
