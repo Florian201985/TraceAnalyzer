@@ -17,7 +17,8 @@ def getOptionsAxis(data):
 
 
 def getStrokes(data):
-    result = ['all']
+    #result = ['all'] --> geht aktuell nicht da in der Analyse nur nach Hüben getrennt ausgegeben wird
+    result = []
     number_of_strokes = 0
     if len(data) > 0:
         for val in data[0]['trace']:

@@ -4,6 +4,7 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 
+import AnalyzeTraces
 import AnanlyzeFiles
 import ImportTraces
 
@@ -54,10 +55,39 @@ with st.sidebar:
         mime='text/csv',
     )
 
-from bokeh.plotting import figure
+def getChartValues(analyzed_traces, option_traces, option_X, option_Y, option_stroke):
+    if option_Y == 'Hubnummer':
+        option_Y += '_X'
+    selected_stroke = 'Stroke_' + str(float(option_stroke))
+    for filename in option_traces:
+        idx = 0
+        for filename_analysis in analyzed_traces:
+            name = filename_analysis['filename'].name
+            if filename == name:
+                data = analyzed_traces[idx]
+                for act_stroke in data['data']:
+                    if act_stroke['stroke'] == selected_stroke:
+                        stroke_data = act_stroke
+                        x_val = stroke_data['trace'][option_X]
+                        y_val = stroke_data['trace'][option_Y]
+                        trace = dict(X=x_val, Y=y_val)
+                        # prüfen ob option_y in fft vorhanden, falls ja speichern falls nein None
+                        fft = dict(Amplitudes=[], Frequencies=[])
+                        result = dict(trace=trace, fft=fft)
+                        break
+                break
+            idx += 1
+    return result
 
-x = [1, 2, 3, 4, 5]
-y = [6, 7, 2, 4, 5]
+
+chart_values = dict(trace=dict(X=[1, 2, 3, 4, 5], Y=[6, 7, 2, 4, 5]),
+                    fft=dict(Amplitudes=[6, 7, 2, 4, 5], Frequencies=[1, 2, 3, 4, 5]))
+analyzed_traces = []
+if len(trace_values) > 0:
+    analyzed_traces = AnalyzeTraces.analyzeTraces(trace_values, cropping=False, crop_val='Z', start=230, end=240)
+    chart_values = getChartValues(analyzed_traces, option_traces, option_X, option_Y, option_stroke)
+
+from bokeh.plotting import figure
 
 TOOLS="hover,crosshair,pan,wheel_zoom,zoom_in,zoom_out,box_zoom,undo,redo,reset,tap,save,box_select,poly_select,lasso_select,help"
 trace_fig = figure(
@@ -66,7 +96,7 @@ trace_fig = figure(
             y_axis_label='y',
             tools=TOOLS)
 
-trace_fig.line(x, y, legend_label='trace', line_width=2)
+trace_fig.line(chart_values['trace']['X'], chart_values['trace']['Y'], legend_label='trace', line_width=2)
 
 st.bokeh_chart(trace_fig, use_container_width=True)
 
@@ -76,7 +106,7 @@ fft_fig = figure(
           y_axis_label='y',
           tools=TOOLS)
 
-fft_fig.line(y, x, legend_label='fft', line_width=2)
+fft_fig.line(chart_values['fft']['Frequencies'], chart_values['fft']['Amplitudes'], legend_label='fft', line_width=2)
 
 st.bokeh_chart(fft_fig, use_container_width=True)
 
