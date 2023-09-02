@@ -4,6 +4,7 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 
+import AnanlyzeFiles
 import ImportTraces
 
 st.title('Trace Analysis')
@@ -19,10 +20,10 @@ with st.sidebar:
         st.write("Importing:", uploaded_file.name)
         trace_val = ImportTraces.ImportData(uploaded_file.getvalue(), 'grinding')
         trace_values.append(dict(filename=uploaded_file, trace=trace_val))
+    filenames = AnanlyzeFiles.getfilenames(trace_values)
     option_traces = st.multiselect(
         'Select Traces for analysis',
-        ['Green', 'Yellow', 'Red', 'Blue'],
-        ['Yellow', 'Red'])
+        filenames, filenames)
     option_X = st.selectbox(
         'Select value for the X-axis',
         ('Email', 'Home phone', 'Mobile phone'))
