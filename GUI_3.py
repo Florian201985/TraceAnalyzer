@@ -58,6 +58,7 @@ with st.sidebar:
     )
 
 def getChartValues(analyzed_traces, option_traces, option_X, option_Y, option_stroke):
+    result = []
     if option_Y == 'Hubnummer':
         option_Y += '_X'
     selected_stroke = 'Stroke_' + str(float(option_stroke))
@@ -82,7 +83,7 @@ def getChartValues(analyzed_traces, option_traces, option_X, option_Y, option_st
                             fft = dict(Amplitudes=stroke_data['fft'][option_Y]['amplitudes'],
                                        Frequencies=stroke_data['fft'][option_Y]['frequencies'],
                                        label=name, x_label=option_X, y_label=option_Y)
-                        result = dict(trace=trace, fft=fft)
+                        result.append(dict(trace=trace, fft=fft))
                         break
                 break
             idx += 1
@@ -99,8 +100,14 @@ y_label_fft = 'frequencies'
 if len(trace_values) > 0:
     analyzed_traces = AnalyzeTraces.analyzeTraces(trace_values, cropping=False, crop_val='Z', start=230, end=240)
     chart_values = getChartValues(analyzed_traces, option_traces, option_X, option_Y, option_stroke)
-    x_label_trace = chart_values['trace']['x_label']
-    y_label_trace = chart_values['trace']['y_label']
+    x_label_trace = chart_values[0]['trace']['x_label']
+    y_label_trace = chart_values[0]['trace']['y_label']
+
+    from bokeh.palettes import Dark2_5 as palette
+    import itertools
+
+    # colors has a list of colors which can be used in plots
+    colors = itertools.cycle(palette)
 
     trace_fig = figure(
                 title='Traces Stroke: ' + str(option_stroke),
@@ -108,9 +115,10 @@ if len(trace_values) > 0:
                 y_axis_label=y_label_trace,
                 tools=TOOLS)
 
-    trace_fig.line(chart_values['trace']['X'], chart_values['trace']['Y'],
-                   legend_label=chart_values['trace']['label'],
-                   line_width=2)
+    for val in chart_values:
+        trace_fig.line(val['trace']['X'], val['trace']['Y'],
+                       legend_label=val['trace']['label'],
+                       line_width=2, color=next(colors))
 
     st.bokeh_chart(trace_fig, use_container_width=True)
 
@@ -120,9 +128,10 @@ if len(trace_values) > 0:
               y_axis_label=y_label_fft,
               tools=TOOLS)
 
-    fft_fig.line(chart_values['fft']['Frequencies'], chart_values['fft']['Amplitudes'],
-                 legend_label=chart_values['fft']['label'],
-                 line_width=2)
+    for val in chart_values:
+        fft_fig.line(val['fft']['Frequencies'], val['fft']['Amplitudes'],
+                     legend_label=val['fft']['label'],
+                     line_width=2, color=next(colors))
 
     st.bokeh_chart(fft_fig, use_container_width=True)
 
