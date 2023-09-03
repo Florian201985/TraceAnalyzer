@@ -6,8 +6,10 @@ import xmltodict
 import pandas
 
 from Trace import Trace
+import streamlit as st
 
 
+@st.cache_data
 def ImportData(path, traceType):
     axis_out = []
     # path = 'C:\\01_Arbeit\\431008\\DatenMaschine\\Moment_B_C.xml'

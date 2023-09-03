@@ -68,6 +68,7 @@ with st.sidebar:
         mime='text/csv',
     )
 
+@st.cache_data
 def getChartValues(analyzed_traces, option_traces, option_X, option_Y, option_stroke):
     result = []
     if option_Y == 'Hubnummer':
@@ -118,7 +119,8 @@ if len(trace_values) > 0:
     import itertools
 
     # colors has a list of colors which can be used in plots
-    colors = itertools.cycle(palette)
+    colors_trace = itertools.cycle(palette)
+    colors_fft = itertools.cycle(palette)
 
     trace_fig = figure(
                 title='Traces Stroke: ' + str(option_stroke),
@@ -129,7 +131,7 @@ if len(trace_values) > 0:
     for val in chart_values:
         trace_fig.line(val['trace']['X'], val['trace']['Y'],
                        legend_label=val['trace']['label'],
-                       line_width=2, color=next(colors))
+                       line_width=2, color=next(colors_trace))
 
     st.bokeh_chart(trace_fig, use_container_width=True)
 
@@ -143,7 +145,7 @@ if len(trace_values) > 0:
     for val in chart_values:
         fft_fig.line(val['fft']['Frequencies'], val['fft']['Amplitudes'],
                      legend_label=val['fft']['label'],
-                     line_width=2, color=next(colors))
+                     line_width=2, color=next(colors_fft))
         if max(val['fft']['Amplitudes']) >= max_val:
             max_val = max(val['fft']['Amplitudes'])
 

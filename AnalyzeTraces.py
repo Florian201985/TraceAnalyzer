@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 from scipy.fft import rfft, rfftfreq
+import streamlit as st
 
 def ParameterFFT(time_values, values):
     duration = time_values[-1] - time_values[0]
