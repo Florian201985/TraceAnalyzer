@@ -19,6 +19,15 @@ def CalcFrequency(rpm):
     return result
 
 
+def getMinMaxValues(analyzed_traces, option_crop_val, option_stroke):
+    trace_data = analyzed_traces[0]['data'][int(option_stroke)-1]['trace']
+    values = trace_data[option_crop_val]
+    min_val = min(values)
+    max_val = max(values)
+    result = dict(min=min_val, max=max_val)
+    return result
+
+
 st.title('Trace Analysis')
 
 # Beschreibung der Input Widgets: https://docs.streamlit.io/library/api-reference/widgets
@@ -47,13 +56,25 @@ with st.sidebar:
     option_stroke = st.selectbox(
         'Select stroke for analysis',
         strokes)
+    # Analyzing trace without cropping
+    if len(trace_values) > 0:
+        analyzed_traces_temp = AnalyzeTraces.analyzeTraces(trace_values, cropping=False, crop_val='time',start=0.0, end=100.0)
+    # cropping the data to specific values in Z or Y,
+    # time is not working as all strokes will be cropped and time is very different between the strokes
     default_idx = options.index(option_X)
+    cropping = st.checkbox('Select if traces should be cropped')
     option_crop_val = st.selectbox(
         'Select value for cropping',
-        options, index=default_idx) # default: Same as option_X
-    values_crop_min = st.slider(
+        ['Lageistwert_Y', 'Lageistwert_Z'], index=1)
+
+    min_max = dict(min=0.0, max=100.0)
+    if len(trace_values) > 0:
+        min_max = getMinMaxValues(analyzed_traces_temp, option_crop_val, option_stroke)
+
+    values_crop = st.slider(
         'Minimum and Maximum value for cropping',
-        0.0, 100.0, (25.0, 75.0))
+        min_max['min'], min_max['max'], (min_max['min'], min_max['max']))
+    # Data for calculating the harmonics
     rpm = st.number_input('Define a rpm for analysis')
     number_of_teeth = st.number_input('Define number of teeth on the gear')
     number_of_starts = st.number_input('Define number of starts on the worm')
@@ -109,8 +130,10 @@ x_label_trace = 'x'
 y_label_trace = 'y'
 x_label_fft = 'amplitudes'
 y_label_fft = 'frequencies'
+
 if len(trace_values) > 0:
-    analyzed_traces = AnalyzeTraces.analyzeTraces(trace_values, cropping=False, crop_val='Z', start=230, end=240)
+    analyzed_traces = AnalyzeTraces.analyzeTraces(trace_values, cropping=cropping, crop_val=option_crop_val,
+                                                  start=values_crop[0], end=values_crop[1])
     chart_values = getChartValues(analyzed_traces, option_traces, option_X, option_Y, option_stroke)
     x_label_trace = chart_values[0]['trace']['x_label']
     y_label_trace = chart_values[0]['trace']['y_label']

@@ -78,9 +78,9 @@ def analyzeTraces(trace_values, cropping, crop_val, start, end):
                 stroke_df = splitted_df[stroke]
                 if crop_val == 'time':
                     cropped_df[stroke] = stroke_df[(stroke_df['time'] >= start) & (stroke_df['time'] <= end)]
-                elif crop_val == 'Z':
+                elif crop_val == 'Lageistwert_Z':
                     cropped_df[stroke] = stroke_df[(stroke_df['Lageistwert_Z'] >= start) & (stroke_df['Lageistwert_Z'] <= end)]
-                elif crop_val == 'Y':
+                elif crop_val == 'Lageistwert_Y':
                     cropped_df[stroke] = stroke_df[(stroke_df['Lageistwert_Y'] >= start) & (stroke_df['Lageistwert_Y'] <= end)]
                 else:
                     raise Exception('crop_val has to be time, Z or Y. The value of crop_val was: {}'.format(crop_val))
