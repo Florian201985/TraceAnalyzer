@@ -65,7 +65,7 @@ with st.sidebar:
     cropping = st.checkbox('Select if traces should be cropped')
     option_crop_val = st.selectbox(
         'Select value for cropping',
-        ['Lageistwert_Y', 'Lageistwert_Z'], index=1)
+        ['Lageistwert_Y', 'Lageistwert_Z'], index=1, disabled=not cropping)
 
     min_max = dict(min=0.0, max=100.0)
     if len(trace_values) > 0:
@@ -73,12 +73,21 @@ with st.sidebar:
 
     values_crop = st.slider(
         'Minimum and Maximum value for cropping',
-        min_max['min'], min_max['max'], (min_max['min'], min_max['max']))
+        min_max['min'], min_max['max'], (min_max['min'], min_max['max']), disabled=not cropping)
     # Data for calculating the harmonics
     rpm = st.number_input('Define a rpm for analysis')
     number_of_teeth = st.number_input('Define number of teeth on the gear')
     number_of_starts = st.number_input('Define number of starts on the worm')
-    harmonics = st.checkbox('Select if harmonics should be marked')
+
+    harmonics_table = st.checkbox('Select if harmonics of the table should be marked')
+    number_of_harmonics_table = st.slider(
+        'Choose the number of harmonics for the table',
+        1, 25, 5, disabled=not harmonics_table)
+
+    harmonics_worm = st.checkbox('Select if harmonics of the worm should be marked')
+    number_of_harmonics_worm = st.slider(
+        'Choose the number of harmonics for the worm',
+        1, 5, 1, disabled=not harmonics_worm)
 
     df = pd.DataFrame()
     csv = df.to_csv().encode('utf-8')
@@ -172,17 +181,13 @@ if len(trace_values) > 0:
         if max(val['fft']['Amplitudes']) >= max_val:
             max_val = max(val['fft']['Amplitudes'])
 
-    number_of_harmonics_table = 0
-    number_of_harmonics_worm = 0
     table_rpm = 0.0
     tabel_freq = 0.0
     worm_freq = 0.0
-    if harmonics:
+    if harmonics_table or harmonics_worm:
         table_rpm = CalcTableRPM(number_of_starts, number_of_teeth, rpm)
         tabel_freq = CalcFrequency(table_rpm)
         worm_freq = CalcFrequency(rpm)
-        number_of_harmonics_table = 10
-        number_of_harmonics_worm = 4
 
     for idx in range(number_of_harmonics_table):
         t_freq = tabel_freq * (idx + 1)
