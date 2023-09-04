@@ -3,8 +3,12 @@ import time
 import streamlit as st
 import pandas as pd
 import numpy as np
+import itertools
+
 from bokeh.models import LogColorMapper, Range1d
 from bokeh.plotting import figure
+from bokeh.palettes import Dark2_5 as palette
+
 
 import AnalyzeTraces
 import AnanlyzeFiles
@@ -147,9 +151,6 @@ if len(trace_values) > 0:
     x_label_trace = chart_values[0]['trace']['x_label']
     y_label_trace = chart_values[0]['trace']['y_label']
 
-    from bokeh.palettes import Dark2_5 as palette
-    import itertools
-
     # colors has a list of colors which can be used in plots
     colors_trace = itertools.cycle(palette)
     colors_fft = itertools.cycle(palette)
@@ -158,20 +159,21 @@ if len(trace_values) > 0:
                 title='Traces Stroke: ' + str(option_stroke),
                 x_axis_label=x_label_trace,
                 y_axis_label=y_label_trace,
-                tools=TOOLS)
+                tools=TOOLS, width=1250)
 
     for val in chart_values:
         trace_fig.line(val['trace']['X'], val['trace']['Y'],
                        legend_label=val['trace']['label'],
                        line_width=2, color=next(colors_trace))
 
-    st.bokeh_chart(trace_fig, use_container_width=True)
+    st.bokeh_chart(trace_fig, use_container_width=False)
+
 
     fft_fig = figure(
               title='FFT Stroke: ' + str(option_stroke) + ', ' + str(option_Y),
               x_axis_label=x_label_fft,
               y_axis_label=y_label_fft,
-              tools=TOOLS)
+              tools=TOOLS, width=1250)
 
     max_val = 0.0
     for val in chart_values:
@@ -200,7 +202,7 @@ if len(trace_values) > 0:
                      legend_label='worm rpm',
                      line_width=1, color='red', line_dash='dashed')
     fft_fig.y_range = Range1d(0, max_val)
-    st.bokeh_chart(fft_fig, use_container_width=True)
+    st.bokeh_chart(fft_fig, use_container_width=False)
 
 
 
