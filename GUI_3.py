@@ -5,7 +5,7 @@ import pandas as pd
 import numpy as np
 import itertools
 
-from bokeh.models import LogColorMapper, Range1d
+from bokeh.models import LogColorMapper, Range1d, NumeralTickFormatter
 from bokeh.plotting import figure
 from bokeh.palettes import Dark2_5 as palette
 
@@ -88,7 +88,7 @@ with st.sidebar:
     harmonics_table = st.checkbox('Select if harmonics of the table should be marked')
     number_of_harmonics_table = st.slider(
         'Choose the number of harmonics for the table',
-        1, 25, 5, disabled=not harmonics_table)
+        1, 50, 5, disabled=not harmonics_table)
 
     harmonics_worm = st.checkbox('Select if harmonics of the worm should be marked')
     number_of_harmonics_worm = st.slider(
@@ -203,6 +203,8 @@ if len(trace_values) > 0:
         fft_fig.line([w_freq, w_freq], [-1.0, 1.0],
                      legend_label='worm rpm',
                      line_width=1, color='red', line_dash='dashed')
+    # Set the y-axis formatter to use standard notation
+    fft_fig.yaxis.formatter = NumeralTickFormatter(format="0.00000")
     fft_fig.y_range = Range1d(0, max_val)
     st.bokeh_chart(fft_fig, use_container_width=False)
 
