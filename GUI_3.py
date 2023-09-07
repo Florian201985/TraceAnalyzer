@@ -75,9 +75,11 @@ with st.sidebar:
     if len(trace_values) > 0:
         min_max = getMinMaxValues(analyzed_traces_temp, option_crop_val, option_stroke)
 
-    values_crop = st.slider(
-        'Minimum and Maximum value for cropping',
-        min_max['min'], min_max['max'], (min_max['min'], min_max['max']), disabled=not cropping)
+    min_crop = st.number_input('Minimum value for cropping', min_value=min_max['min'], max_value=min_max['max'],
+                               value=min_max['min'], step=1.0)
+    max_crop = st.number_input('Maximum value for cropping', min_value=min_max['min'], max_value=min_max['max'],
+                               value=min_max['max'], step=1.0)
+    values_crop = [min_crop, max_crop]
     # Data for calculating the harmonics
     rpm = st.number_input('Define a rpm for analysis')
     number_of_teeth = st.number_input('Define number of teeth on the gear')
