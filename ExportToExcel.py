@@ -2,7 +2,7 @@ import pandas as pd
 from openpyxl import load_workbook
 
 
-def export_to_excel(filename_excel, parameters):
+def export_to_excel(filename_excel, parameters, trace_fft):
 
     # Find the maximum length of x and y across all parameters
     max_len_x = max(len(param['trace']['X']) for param in parameters)
@@ -13,15 +13,15 @@ def export_to_excel(filename_excel, parameters):
 
     # Iterate through the parameters list
     for param in parameters:
-        trace_param = param['trace']
+        trace_param = param[trace_fft]
         x_label = trace_param['x_label']
-        x = trace_param['X']
+        x = list(trace_param['X'].values)
         y_label = trace_param['y_label']
-        y = trace_param['Y']
+        y = list(trace_param['Y'].values)
 
-        # Pad x and y with NaN values if necessary
-        x += [float('nan')] * (max_len_x - len(x))
-        y += [float('nan')] * (max_len_y - len(y))
+        for idx in range(max_len_x-len(x)):
+            x.append(float('nan'))
+            y.append(float('nan'))
 
         # Create a DataFrame for the current parameter
         df_param = pd.DataFrame({x_label: x, y_label: y})
@@ -44,7 +44,7 @@ def export_to_excel(filename_excel, parameters):
     col = 1
     for param in parameters:
         # Set the values for filename and label
-        ws.cell(row=1, column=col, value=param['trace']['label'])
+        ws.cell(row=1, column=col, value=param[trace_fft]['label'])
         ws.cell(row=2, column=col, value='')
         col += 2
 

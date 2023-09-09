@@ -164,6 +164,10 @@ if len(trace_values) > 0:
 
     st.bokeh_chart(trace_fig, use_container_width=False)
 
+    if st.button("Download trace data as .xslx", type='primary'):
+        home_dir = os.path.expanduser("~")
+        download_path = os.path.join(home_dir, "Downloads", 'trace.xlsx')
+        ExportToExcel.export_to_excel(download_path, chart_values, 'trace')
 
     fft_fig = figure(
               title='FFT Stroke: ' + str(option_stroke) + ', ' + str(option_Y),
@@ -202,11 +206,10 @@ if len(trace_values) > 0:
     fft_fig.y_range = Range1d(0, max_val)
     st.bokeh_chart(fft_fig, use_container_width=False)
 
-    if st.button("Download data as .xslx", type='primary'):
+    if st.button("Download fft data as .xslx", type='primary'):
         home_dir = os.path.expanduser("~")
-        download_path = os.path.join(home_dir, "Downloads", 'output.xlsx')
-        ExportToExcel.export_to_excel(download_path, chart_values)
-
+        download_path = os.path.join(home_dir, "Downloads", 'fft.xlsx')
+        ExportToExcel.export_to_excel(download_path, chart_values, 'fft')
 
 def normal2d(X, Y, sigx=1.0, sigy=1.0, mux=0.0, muy=0.0):
     z = (X-mux)**2 / sigx**2 + (Y-muy)**2 / sigy**2
