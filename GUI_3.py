@@ -1,3 +1,4 @@
+import os
 import time
 
 import streamlit as st
@@ -12,6 +13,7 @@ from bokeh.palettes import Dark2_5 as palette
 
 import AnalyzeTraces
 import AnanlyzeFiles
+import ExportToExcel
 import ImportTraces
 
 def CalcTableRPM(number_of_starts, number_of_teeth, worm_rpm):
@@ -95,14 +97,6 @@ with st.sidebar:
         'Choose the number of harmonics for the worm',
         1, 5, 1, disabled=not harmonics_worm)
 
-    df = pd.DataFrame()
-    csv = df.to_csv().encode('utf-8')
-    st.download_button(
-        label="Download data as CSV",
-        data=csv,
-        file_name='large_df.csv',
-        mime='text/csv',
-    )
 
 @st.cache_data
 def getChartValues(analyzed_traces, option_traces, option_X, option_Y, option_stroke):
@@ -208,6 +202,10 @@ if len(trace_values) > 0:
     fft_fig.y_range = Range1d(0, max_val)
     st.bokeh_chart(fft_fig, use_container_width=False)
 
+    if st.button("Download data as .xslx", type='primary'):
+        home_dir = os.path.expanduser("~")
+        download_path = os.path.join(home_dir, "Downloads", 'output.xlsx')
+        ExportToExcel.export_to_excel(download_path, chart_values)
 
 
 def normal2d(X, Y, sigx=1.0, sigy=1.0, mux=0.0, muy=0.0):
