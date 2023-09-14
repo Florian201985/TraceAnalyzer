@@ -4,9 +4,15 @@ from openpyxl import load_workbook
 
 def export_to_excel(filename_excel, parameters, trace_fft):
 
+    x_key = 'X'
+    y_key = 'Y'
+    if trace_fft == 'fft':
+        x_key = 'Frequencies'
+        y_key = 'Amplitudes'
+
     # Find the maximum length of x and y across all parameters
-    max_len_x = max(len(param['trace']['X']) for param in parameters)
-    max_len_y = max(len(param['trace']['Y']) for param in parameters)
+    max_len_x = max(len(param[trace_fft][x_key]) for param in parameters)
+    max_len_y = max(len(param[trace_fft][y_key]) for param in parameters)
 
     # Create a DataFrame
     df = pd.DataFrame()
@@ -15,9 +21,15 @@ def export_to_excel(filename_excel, parameters, trace_fft):
     for param in parameters:
         trace_param = param[trace_fft]
         x_label = trace_param['x_label']
-        x = list(trace_param['X'].values)
         y_label = trace_param['y_label']
-        y = list(trace_param['Y'].values)
+        if trace_fft == 'fft':
+            x = list(trace_param[x_key])
+            y = list(trace_param[y_key])
+        else:
+            x = list(trace_param[x_key].values)
+            y = list(trace_param[y_key].values)
+
+
 
         for idx in range(max_len_x-len(x)):
             x.append(float('nan'))
